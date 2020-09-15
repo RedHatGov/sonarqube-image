@@ -14,4 +14,4 @@ Running containers on OpenShift comes with certain security and other requiremen
 
 ## Operator Deployment
 
-A SonarQube Operator can be found [here](https://github.com/jharmison-redhat/sonarqube-operator). Operators are the preferred way to deploy applications on Kubernetes.
+A SonarQube Operator can be found [here](https://github.com/RedHatGov/sonarqube-operator). Operators are the preferred way to deploy applications on Kubernetes.
