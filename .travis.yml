@@ -11,4 +11,4 @@ deploy:
   provider: script
   script: ./build.sh -b quay -d -l -t $SONAR_VERSION -- --build-arg=SONAR_VERSION=$SONAR_VERSION
   on:
-    branch: master
+    branch: main
