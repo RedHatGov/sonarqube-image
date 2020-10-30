@@ -4,7 +4,7 @@ language: minimal
 services:
   - docker
 env:
-  - SONAR_VERSION=8.3.1
+  - SONAR_VERSION=8.3.1.34397
 script:
   - ./build.sh -b local -d -l -t $SONAR_VERSION -- --build-arg=SONAR_VERSION=$SONAR_VERSION
 deploy:
