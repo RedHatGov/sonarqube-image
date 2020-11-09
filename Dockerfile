@@ -25,7 +25,9 @@ RUN yum -y install unzip java-11-openjdk nss_wrapper nodejs \
     && cd /opt \
     && unzip /tmp/sonarqube.zip \
     && mv sonarqube-$SONAR_VERSION sonarqube \
-    && rm /tmp/sonarqube.zip*
+    && rm /tmp/sonarqube.zip* \
+    && rm /opt/sonarqube/extensions/plugins/sonar-java-plugin-*.jar \
+    && curl -o /opt/sonarqube/extensions/plugins/sonar-java-plugin-6.3.2.22818.jar https://binaries.sonarsource.com/Distribution/sonar-java-plugin/sonar-java-plugin-6.3.2.22818.jar
 
 ADD root /
 
