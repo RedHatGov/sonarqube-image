@@ -23,7 +23,7 @@ if [ ${#missing[@]} -ne 0 ]; then
 fi
 
 # Enable verbose output
-if echo "$*" | grep -qF "-v" || echo "$*" | grep -qF "--verbose"; then
+if echo "$*" | grep -qF -- "-v" || echo "$*" | grep -qF -- "--verbose"; then
     set -ex
 else
     set -e
