@@ -83,7 +83,7 @@ rm sonarqube-$SONARQUBE_VERSION.zip
 mv sonarqube-$SONARQUBE_VERSION sonarqube
 
 # Sonar-java-plugin update
-rm sonarqube/extensions/plugins/sonar-java-plugin-*.jar ||:
+rm sonarqube/lib/extensions/sonar-java-plugin-*.jar ||:
 mv sonar-java-plugin-*.jar sonarqube/extensions/plugins/
 
 echo "Sonarqube is unpacked to $(pwd)"

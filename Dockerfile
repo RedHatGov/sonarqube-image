@@ -35,7 +35,7 @@ RUN dnf -y install java-11-openjdk nodejs \
  && rm -rf /var/cache/yum /var/cache/dnf \
  && chown -R 1001:0 /opt/sonarqube \
  && chmod -R u=rwX,g=rX,o=rX /opt/sonarqube \
- && chmod -R u=rwX,g=rwX,o=rX /opt/sonarqube/extensions
+ && chmod -R u=rwX,g=rwX,o=rX /opt/sonarqube/{extensions,temp,logs,data}
 COPY root /
 
 USER 1001
