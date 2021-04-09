@@ -1,42 +1,45 @@
+# Downloader will retrieve installation bundles
+FROM registry.access.redhat.com/ubi8/ubi as downloader
+ARG SONARQUBE_VERSION=8.7.0.41497
+ARG SONAR_JAVA_PLUGIN_VERSION=6.13.0.25138
+
+ENV SONARQUBE_VERSION=$SONARQUBE_VERSION \
+    SONAR_JAVA_PLUGIN_VERSION=$SONAR_JAVA_PLUGIN_VERSION
+
+WORKDIR /download
+COPY scripts/sonar-download.sh ./
+RUN dnf -y install unzip curl gpg \
+ && ./sonar-download.sh
+
+# Final image will have Sonarqube installed
 FROM registry.access.redhat.com/ubi8/ubi
-LABEL maintainer="James Harmison <jharmison@redhat.com>"
+ARG SONARQUBE_VERSION=8.7.0.41497
+ARG SONAR_JAVA_PLUGIN_VERSION=6.13.0.25138
 
-ARG SONAR_VERSION=7.9.4
-ARG BUILD_DATE=2020-08-06
-
-ENV SONAR_VERSION=$SONAR_VERSION \
-    SONARQUBE_HOME=/opt/sonarqube
+ENV SONARQUBE_VERSION=$SONARQUBE_VERSION \
+    SONAR_JAVA_PLUGIN_VERSION=$SONAR_JAVA_PLUGIN_VERSION
 
 LABEL name="SonarQube" \
+      vendor="Sonatype" \
       io.k8s.display-name="SonarQube" \
-      io.k8s.description="Provide a SonarQube image to run on Red Hat OpenShift" \
-      io.openshift.expose-services="9000" \
+      io.openshift.expose-services="9000:http" \
       io.openshift.tags="sonarqube" \
-      build-date=$BUILD_DATE \
-      version=$SONAR_VERSION \
-      release="1"
+      org.sonarqube.version=$SONARQUBE_VERSION \
+      org.sonarqube.plugins.sonar-java.version=$SONAR_JAVA_PLUGIN_VERSION \
+      release="2" \
+      maintainer="James Harmison <jharmison@redhat.com>"
 
+COPY --from=downloader /download/opt /opt
+RUN dnf -y install java-11-openjdk nodejs \
+ && dnf clean all \
+ && rm -rf /var/cache/yum /var/cache/dnf \
+ && chown -R 1001:0 /opt/sonarqube \
+ && chmod -R u=rwX,g=rX,o=rX /opt/sonarqube \
+ && chmod -R u=rwX,g=rwX,o=rX /opt/sonarqube/{extensions,temp,logs,data}
+COPY root /
 
-RUN yum -y install unzip java-11-openjdk nss_wrapper nodejs \
-    && yum clean all \
-    && rm -rf /var/cache/yum \
-    && cd /tmp \
-    && curl -o sonarqube.zip -fSL https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-$SONAR_VERSION.zip \
-    && cd /opt \
-    && unzip /tmp/sonarqube.zip \
-    && mv sonarqube-$SONAR_VERSION sonarqube \
-    && rm /tmp/sonarqube.zip* \
-    && rm /opt/sonarqube/extensions/plugins/sonar-java-plugin-*.jar \
-    && curl -o /opt/sonarqube/extensions/plugins/sonar-java-plugin-6.3.2.22818.jar https://binaries.sonarsource.com/Distribution/sonar-java-plugin/sonar-java-plugin-6.3.2.22818.jar
-
-ADD root /
-
-RUN useradd -r sonar \
-    && chmod 775 $SONARQUBE_HOME/bin/run_sonarqube.sh \
-    && /usr/bin/fix-permissions /opt/sonarqube
-
-USER sonar
-WORKDIR $SONARQUBE_HOME
-VOLUME $SONARQUBE_HOME/data
+USER 1001
+WORKDIR /opt/sonarqube
+VOLUME /opt/sonarqube/data
 EXPOSE 9000
-ENTRYPOINT ["./bin/run_sonarqube.sh"]
+ENTRYPOINT ["/opt/sonarqube/bin/run_sonarqube.sh"]
