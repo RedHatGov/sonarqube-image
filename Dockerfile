@@ -30,13 +30,13 @@ LABEL name="SonarQube" \
       maintainer="James Harmison <jharmison@redhat.com>"
 
 COPY --from=downloader /download/opt /opt
+COPY root /
 RUN dnf -y install java-11-openjdk nodejs \
  && dnf clean all \
  && rm -rf /var/cache/yum /var/cache/dnf \
  && chown -R 1001:0 /opt/sonarqube \
- && chmod -R u=rwX,g=rX,o=rX /opt/sonarqube \
+ && chmod -R u=rwX,g=rwX,o=rX /opt/sonarqube \
  && chmod -R u=rwX,g=rwX,o=rX /opt/sonarqube/{extensions,temp,logs,data}
-COPY root /
 
 USER 1001
 WORKDIR /opt/sonarqube
